@@ -1,0 +1,189 @@
+###########################This is an option file####################################
+
+################################tools option#########################################
+
+# hhblits program path
+hhblits_program = YOUR_ENV/bin/hhblits
+
+# hhfilter program path
+hhfilter_program = YOUR_ENV/bin/hhfilter
+
+# hhmake program path
+hhmake_program = YOUR_ENV/bin/hhmake
+
+# hhalign program path
+hhalign_program = YOUR_ENV/bin/hhalign
+
+# jackhmmer program path
+jackhmmer_program = YOUR_ENV/bin/jackhmmer
+
+# hhsearch program path
+hhsearch_program = YOUR_ENV/bin/hhsearch
+
+# deepmsa2 program path
+deepmsa2_program = INSTALLDIR_TOOLS/deepmsa/hhsuite2/scripts/build_MSA2.py
+
+# tmalign program path
+tmalign_program = INSTALLDIR_TOOLS/tmalign/TMalign
+
+# mmalign program path
+mmalign_program = INSTALLDIR_TOOLS/mmalign/MMalign
+
+# dockq program
+dockq_program = INSTALLDIR_TOOLS/DockQ/DockQ.py
+
+# qscore program
+qscore_program = INSTALLDIR_TOOLS/pairwiseQA/q_score
+
+# tmscore program
+tmscore_program = INSTALLDIR_TOOLS/tmscore/TMscore
+
+################################MSA generation tool###########################
+
+colabfold_search_program = INSTALLDIR_TOOLS/colabfold/search.py
+
+colabfold_split_msas_program = INSTALLDIR_TOOLS/colabfold/split_msas.py
+
+colabfold_databases = INSTALLDIR_DATABASES/colabfold
+
+mmseq_program = YOUR_ENV/bin/mmseqs
+
+################################QA option#####################################
+
+#########################Customized alphafold program###########################
+
+# alphafold environment directory
+alphafold_env_dir = YOUR_ENV/bin/
+
+# alphafold database directory
+alphafold_database_dir = AFDB_DIR
+
+# alphafold program path
+alphafold_program_dir = AF_DIR
+
+# alphafold tertiary structure prediction script
+alphafold_program = run_alphafold_refine.py
+
+# alphafold tertiary structure prediction script
+alphafold_multimer_program = run_alphafold_multimer_custom.py
+
+# alphafold tertiary structure prediction script
+alphafold_default_program = run_alphafold_pre.py
+
+# AlphaFold2 parameters
+monomer_num_ensemble = 1
+monomer_num_recycle = 3
+num_monomer_predictions_per_model = 1
+monomer_model_preset = monomer
+
+# AlphaFold-Multimer parameters
+multimer_num_ensemble = 1
+multimer_num_recycle = 3
+num_multimer_predictions_per_model = 5
+multimer_model_preset = multimer
+
+# Common parameters
+alphafold_benchmark = True
+use_gpu_relax = True
+
+# ALL, BEST, NONE
+models_to_relax = BEST
+
+max_template_date = 2099-01-01
+
+pdb_release_date_file = INSTALLDIR_DATABASES/pdb_release_date_filtered.csv
+
+######################Monomer template search option#################################
+
+foldseek_program = /share/home/xufeng/Software/miniconda3/bin/foldseek
+
+foldcomp_program = /share/home/xufeng/Software/foldcomp
+
+#foldseek_pdb_database = INSTALLDIR_TOOLS/foldseek/databases/complex
+foldseek_pdb_database = /share/home/xufeng/Projects/run_foldseek/foldseek_mine_afdb50_with_cas12/cas12_mine_afdb50_res_pdbs/cas12_mine_afdb50_DB
+#foldseek_pdb_database = /share/home/xufeng/Data/AFDB/afdb50_db/afdb50
+
+foldcomp_database = /share/home/xufeng/Projects/run_foldseek/foldseek_mine_afdb50_with_cas12/cas12_mine_afdb50_res_pdbs/cas12_mine_afdb50_res_fcz/cas12_mine_afdb50_fcz
+
+#foldseek_pdb_database_dir = INSTALLDIR_DATABASES/pdb_complex/pdb
+foldseek_pdb_database_dir = ''
+
+#foldseek_af_database = INSTALLDIR_TOOLS/foldseek/databases/af_db
+foldseek_af_database =
+
+#foldseek_af_database_dir = INSTALLDIR_DATABASES/af_pdbs
+foldseek_af_database_dir = ''
+
+######################Cas12fold database option#################################
+cas12fold_db = /share/home/xufeng/Projects/af2_optimizm/cas12fold_test/batch_test_20240809/cas12.yu_zhang_JGI_afdb50.with_ruvc_tnpb.fa
+
+run_alphafold2_wt = True
+
+run_alphafold2_wt_only = False
+
+merge_cas12folddb_mode = both
+
+################################databases option#####################################
+
+bfd_database = AFDB_DIR/bfd/bfd_metaclust_clu_complete_id30_c90_final_seq.sorted_opt
+
+mgnify_database = AFDB_DIR/mgnify/mgy_clusters_2022_05.fa
+
+metaclust_database = INSTALLDIR_DATABASES/Metaclust_2018_06/metaclust_50
+
+img_database = INSTALLDIR_DATABASES/img/img_new.fasta
+
+###########################Complex alignment generation option#######################
+
+###########################UNIPROT TO PDB database option############################
+
+# uniclust database
+uniclust_db = INSTALLDIR_DATABASES/uniclust30_2018_08/uniclust30_2018_08
+
+# uniref database
+uniref_db = AFDB_DIR/uniref30/UniRef30_2021_03
+
+uniref90_fasta = AFDB_DIR/uniref90/uniref90.fasta
+
+uniprot_fasta = AFDB_DIR/uniprot/uniprot.fasta
+
+###########################UNIPROT TO PDB database option############################
+
+uniprot2pdb_mapping_file = INSTALLDIR_DATABASES/uniprot2pdb/uniprot2pdb.map
+
+complexes_list = INSTALLDIR_DATABASES/uniprot2pdb/complexes_cm.list
+
+###########################STRING database option####################################
+
+string2uniprot_map = INSTALLDIR_DATABASES/string/string2uniprot.map
+
+#######################End of Complex alignment generation option###################
+
+
+###########################Complex template search option###########################
+
+###########################Sequence and structure based template search option####################
+
+pdb70_hhsuite_database = AFDB_DIR/pdb70/pdb70
+
+pdb70_hhsuite_cluster_tsv = AFDB_DIR/pdb70/pdb70_clu.tsv
+
+pdb_seqs_dir = AFDB_DIR/pdb_seqres/pdb_seqs
+
+pdb_sort90_hhsuite_database = INSTALLDIR_DATABASES/pdb_sort90/hhsuitedb3
+
+pdb_sort90_hhsuite_cluster_tsv = INSTALLDIR_DATABASES/pdb_sort90/sort90_clust
+
+pdb_sort90_atom_dir = INSTALLDIR_DATABASES/pdb_sort90/pdb
+
+pdb_sort90_hmm_dir =INSTALLDIR_DATABASES/pdb_sort90/hmm
+
+complex_sort90_hhsuite_database = INSTALLDIR_DATABASES/pdb_complex/hhsuitedb3
+
+complex_sort90_hhsuite_cluster_tsv = INSTALLDIR_DATABASES/pdb_complex/sort90_clust
+
+complex_sort90_atom_dir = INSTALLDIR_DATABASES/pdb_complex/pdb
+
+complex_sort90_hmm_dir = INSTALLDIR_DATABASES/pdb_complex/hmm
+
+#######################End of Complex alignment generation option###################
