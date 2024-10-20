@@ -160,14 +160,8 @@ def padding_consistent_rng(f):
     return jax.vmap(functools.partial(grid_keys, shape=shape[1:]))(new_keys)
 
   def inner(key, shape, **kwargs):
-    keys = grid_keys(key, shape)
-    signature = (
-        '()->()'
-        if jax.dtypes.issubdtype(keys.dtype, jax.dtypes.prng_key)
-        else '(2)->()'
-    )
     return jnp.vectorize(
-        functools.partial(f, shape=(), **kwargs), signature=signature
-    )(keys)
-
+        lambda key: f(key, shape=(), **kwargs),
+        signature='(2)->()')(
+            grid_keys(key, shape))
   return inner

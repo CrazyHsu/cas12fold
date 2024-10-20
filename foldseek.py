@@ -69,7 +69,8 @@ class Foldseek:
                 logging.error('Could not find HHsearch database %s', database_path)
                 raise ValueError(f'Could not find HHsearch database {database_path}')
 
-    def query(self, pdb: str, outdir: str, progressive_threshold=1, tmscore_threshold=0.3, maxseq=2000) -> str:
+    def query(self, pdb: str, outdir: str, progressive_threshold=1, tmscore_threshold=0.3, maxseq=2000,
+              result_overwrite=False) -> str:
         """Queries the database using HHsearch using a given a3m."""
         input_path = os.path.join(outdir, 'query.pdb')
         os.system(f"cp {pdb} {input_path}")
@@ -81,12 +82,13 @@ class Foldseek:
         tmscore_df = pd.DataFrame(
             columns=['query', 'target', 'qaln', 'taln', 'qstart', 'qend', 'tstart', 'tend', 'evalue', 'alnlen'])
 
+        databases = [self.pdb_database]
         if self.other_databases != [""]:
             databases = [self.pdb_database] + self.other_databases
         for database in databases:
             database_name = pathlib.Path(database).stem
             outfile = os.path.join(outdir, f'aln.m8_{database_name}')
-            if not os.path.exists(outfile):
+            if (not result_overwrite and not os.path.exists(outfile)) or result_overwrite:
                 cmd = [self.binary_path,
                        'easy-search',
                        input_path,
@@ -126,8 +128,9 @@ class Foldseek:
             #     pdb_df_filtered.reset_index(inplace=True, drop=True)
             #     pdb_df_filtered.to_csv(outfile, sep='\t')
 
-            evalue_df = evalue_df.append(pd.read_csv(outfile, sep='\t'))
-            evalue_df['target'] = evalue_df['target'].astype(str) + ".local"
+            tmp_evalue_df = pd.read_csv(outfile, sep='\t')
+            tmp_evalue_df['target'] = tmp_evalue_df['target'].astype(str) + ".local"
+            evalue_df = evalue_df.append(tmp_evalue_df)
 
         evalue_df = evalue_df.sort_values(by='evalue')
         evalue_df.reset_index(inplace=True, drop=True)
@@ -138,7 +141,7 @@ class Foldseek:
             for database in databases:
                 database_name = pathlib.Path(database).stem
                 outfile = os.path.join(outdir, f'aln.m8_{database_name}.tm')
-                if not os.path.exists(outfile):
+                if (not result_overwrite and not os.path.exists(outfile)) or result_overwrite:
                     cmd = [self.binary_path,
                            'easy-search',
                            input_path,
@@ -179,8 +182,9 @@ class Foldseek:
                 #     pdb_df_filtered.reset_index(inplace=True, drop=True)
                 #     pdb_df_filtered.to_csv(outfile, sep='\t')
 
-                tmscore_df = tmscore_df.append(pd.read_csv(outfile, sep='\t'))
-                tmscore_df['target'] = tmscore_df['target'].astype(str) + ".global"
+                tmp_tmscore_df = pd.read_csv(outfile, sep='\t')
+                tmp_tmscore_df['target'] = tmp_tmscore_df['target'].astype(str) + ".global"
+                tmscore_df = tmscore_df.append(tmp_tmscore_df)
 
             tmscore_df = tmscore_df.sort_values(by='evalue', ascending=False)
             tmscore_df.reset_index(inplace=True, drop=True)

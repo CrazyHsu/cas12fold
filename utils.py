@@ -14,7 +14,6 @@ import time
 import numpy as np
 from typing import Optional
 from absl import logging
-from template_concatenation import parsers
 from typing import Any, Mapping, MutableMapping, Optional, Sequence, Union
 from alphafold.data import msa_identifiers
 from alphafold.common import residue_constants

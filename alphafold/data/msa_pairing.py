@@ -15,7 +15,9 @@
 """Pairing logic for multimer data pipeline."""
 
 import collections
-from typing import cast, Dict, Iterable, List, Sequence
+import functools
+import string
+from typing import Any, Dict, Iterable, List, Sequence
 
 from alphafold.common import residue_constants
 from alphafold.data import pipeline
@@ -133,7 +135,7 @@ def _create_species_dict(msa_df: pd.DataFrame) -> Dict[bytes, pd.DataFrame]:
   """Creates mapping from species to msa dataframe of that species."""
   species_lookup = {}
   for species, species_df in msa_df.groupby('msa_species_identifiers'):
-    species_lookup[cast(bytes, species)] = species_df
+    species_lookup[species] = species_df
   return species_lookup
 
 

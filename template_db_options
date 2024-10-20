@@ -20,6 +20,9 @@ jackhmmer_program = YOUR_ENV/bin/jackhmmer
 # hhsearch program path
 hhsearch_program = YOUR_ENV/bin/hhsearch
 
+# kalign program path
+kalign_program = YOUR_ENV/bin/kalign
+
 # deepmsa2 program path
 deepmsa2_program = INSTALLDIR_TOOLS/deepmsa/hhsuite2/scripts/build_MSA2.py
 
@@ -37,6 +40,12 @@ qscore_program = INSTALLDIR_TOOLS/pairwiseQA/q_score
 
 # tmscore program
 tmscore_program = INSTALLDIR_TOOLS/tmscore/TMscore
+
+# cif2pdb program
+cif2pdb_program = INSTALLDIR_TOOLS/cif2pdb
+
+# cif2pdb program
+pdb_selchain_program = /share/home/xufeng/Software/miniconda3/bin/pdb_selchain
 
 ################################MSA generation tool###########################
 
@@ -62,7 +71,7 @@ alphafold_database_dir = AFDB_DIR
 alphafold_program_dir = AF_DIR
 
 # alphafold tertiary structure prediction script
-alphafold_program = run_alphafold_refine.py
+run_cas12fold_refiner_program = cas12fold_refiner/run_cas12fold_refiner.py
 
 # alphafold tertiary structure prediction script
 alphafold_multimer_program = run_alphafold_multimer_custom.py
@@ -101,9 +110,12 @@ foldcomp_program = /share/home/xufeng/Software/foldcomp
 
 #foldseek_pdb_database = INSTALLDIR_TOOLS/foldseek/databases/complex
 foldseek_pdb_database = /share/home/xufeng/Projects/run_foldseek/foldseek_mine_afdb50_with_cas12/cas12_mine_afdb50_res_pdbs/cas12_mine_afdb50_DB
+rcsb_foldseek_database = /share/home/xufeng/Projects/run_foldseek/foldseek_mine_afdb50_with_cas12/rcsb_foldseek_db/rcsb_foldseek_db
+cas12_foldseek_database = /share/home/xufeng/Projects/run_foldseek/foldseek_mine_afdb50_with_cas12/cas12_mine_afdb50_res_pdbs/cas12_mine_afdb50_DB
+#afdb50_foldseek_database = /share/home/xufeng/Data/AFDB/afdb50_db/afdb50
 #foldseek_pdb_database = /share/home/xufeng/Data/AFDB/afdb50_db/afdb50
 
-foldcomp_database = /share/home/xufeng/Projects/run_foldseek/foldseek_mine_afdb50_with_cas12/cas12_mine_afdb50_res_pdbs/cas12_mine_afdb50_res_fcz/cas12_mine_afdb50_fcz
+cas12_afdb50_foldcomp_database = /share/home/xufeng/Projects/run_foldseek/foldseek_mine_afdb50_with_cas12/cas12_mine_afdb50_res_pdbs/cas12_mine_afdb50_res_fcz/cas12_mine_afdb50_fcz
 
 #foldseek_pdb_database_dir = INSTALLDIR_DATABASES/pdb_complex/pdb
 foldseek_pdb_database_dir = ''
@@ -115,19 +127,19 @@ foldseek_af_database =
 foldseek_af_database_dir = ''
 
 ######################Cas12fold database option#################################
-cas12fold_db = /share/home/xufeng/Projects/af2_optimizm/cas12fold_test/batch_test_20240809/cas12.yu_zhang_JGI_afdb50.with_ruvc_tnpb.fa
+cas12folddb_database_path = /share/home/xufeng/Projects/af2_optimizm/cas12fold_test/batch_test_20240809/cas12.yu_zhang_JGI_afdb50.with_ruvc_tnpb.fa
 
-run_alphafold2_wt = True
-
-run_alphafold2_wt_only = False
-
-merge_cas12folddb_mode = both
+cas12folddb_template_database_path = /share/home/xufeng/Projects/run_foldseek/foldseek_mine_afdb50_with_cas12/cas12_mine_rcsb_hhdb/cas12_mine_rcsb
 
 ################################databases option#####################################
 
 bfd_database = AFDB_DIR/bfd/bfd_metaclust_clu_complete_id30_c90_final_seq.sorted_opt
 
 mgnify_database = AFDB_DIR/mgnify/mgy_clusters_2022_05.fa
+
+template_mmcif_dir = AFDB_DIR/pdb_mmcif/mmcif_files/
+
+obsolete_pdbs_path = AFDB_DIR/pdb_mmcif/obsolete.dat
 
 metaclust_database = INSTALLDIR_DATABASES/Metaclust_2018_06/metaclust_50
 

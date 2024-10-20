@@ -142,6 +142,17 @@ def parse(*,
         seq_start_num = {val_chain_id: min([monomer.num for monomer in seq])
                          for val_chain_id, seq in valid_chains.items()}
 
+        if header["has_missing_residues"]:
+            tmp_seq_start_num = {}
+            for chain_id in seq_start_num:
+                tmp_seq_start_num.update({chain_id: []})
+                for item in header["missing_residues"]:
+                    if item["chain"] == chain_id:
+                        tmp_seq_start_num[chain_id].append(item["ssseq"])
+
+            seq_start_num = {val_chain_id: min([seq_start_num[val_chain_id], min(tmp_seq_start_num[val_chain_id])])
+                             for val_chain_id, _ in valid_chains.items()}
+
         seq_to_structure_mappings = {}
         for atom in first_model_structure.get_atoms():
             hetflag = ' '
@@ -162,6 +173,18 @@ def parse(*,
                                                  hetflag=hetflag)
 
             seq_to_structure_mappings[chain_id] = current
+
+        if header["has_missing_residues"]:
+            for chain_id in seq_start_num:
+                for item in header["missing_residues"]:
+                    if item["chain"] == chain_id:
+                        current_mapping = seq_to_structure_mappings[chain_id]
+                        seq_idx = int(item["ssseq"]) - seq_start_num[chain_id]
+                        if seq_idx not in current_mapping:
+                            current_mapping[seq_idx] = ResidueAtPosition(position=None,
+                                                                         name=item["res_name"],
+                                                                         is_missing=True,
+                                                                         hetflag=' ')
 
         # Add missing residue information to seq_to_structure_mappings.
         # for chain_id, seq_info in valid_chains.items():
