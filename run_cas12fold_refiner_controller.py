@@ -23,6 +23,7 @@ flags.DEFINE_string('pkl_path', None, 'Path to af2 predicted pkl used to refine'
 flags.DEFINE_string('msas_dir', None, 'Path to directory of af2 predicted msas')
 flags.DEFINE_string('output_dir', default="cas12fold_refine", help='Output directory')
 flags.DEFINE_string('gpu_device', default="0", help='The GPU devices to predict')
+flags.DEFINE_integer('max_iteration', default=1, help="The maximum iteration to refine the structure")
 flags.DEFINE_boolean('result_overwrite', default=False, help='Whether to overwrite the output. Default: False')
 flags.DEFINE_boolean('template_select_foldseek_global', default=False,
                      help="Whether to select foldseek global results in structure_templates.csv.")
@@ -92,7 +93,8 @@ def main(argv):
     cas12fold_refiner_pipeline.cas12fold_refiner(params=params, refinement_input=refine_input, outdir=outdir,
                                                  finaldir=outdir_final, prefix="refine",
                                                  result_overwrite=FLAGS.result_overwrite, gpu_device=FLAGS.gpu_device,
-                                                 template_select_foldseek_global=FLAGS.template_select_foldseek_global)
+                                                 template_select_foldseek_global=FLAGS.template_select_foldseek_global,
+                                                 max_iteration=FLAGS.max_iteration)
 
 
 if __name__ == '__main__':

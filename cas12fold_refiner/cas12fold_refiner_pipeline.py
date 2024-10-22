@@ -8,6 +8,7 @@ import os, pathlib, pickle, json
 import datetime, copy
 import pandas as pd
 # import numpy as np
+import biotite.structure.io as bsio
 from cas12fold_refiner import cas12fold_refiner_parsers
 
 from foldseek import Foldseek
@@ -410,11 +411,11 @@ def assess_foldseek_hit(
 
 class cas12fold_refinement_iterative_pipeline:
 
-    def __init__(self, params, max_template_count=50):
+    def __init__(self, params, max_template_count=50, max_iteration=5):
 
         self.params = params
 
-        self.max_iteration = 5
+        self.max_iteration = max_iteration
 
         self.max_template_count = max_template_count
 
@@ -664,7 +665,7 @@ class cas12fold_refinement_iterative_pipeline:
 
         print(f"Start to refine {pdb_path}")
 
-        for num_iteration in range(self.max_iteration)[0:1]:
+        for num_iteration in range(self.max_iteration):
             os.chdir(cwd)
             current_work_dir = os.path.join(outdir, f"iteration{num_iteration + 1}")
             makedir_if_not_exists(current_work_dir)
@@ -677,8 +678,8 @@ class cas12fold_refinement_iterative_pipeline:
             os.system(f"cp {ref_start_msa} {start_msa}")
             os.system(f"cp {ref_start_pkl} {start_pkl}")
 
-            with open(ref_start_pkl, 'rb') as f:
-                ref_avg_lddt = np.mean(pickle.load(f)['plddt'])
+            struct = bsio.load_structure(ref_start_pdb, extra_fields=["b_factor"])
+            ref_avg_lddt = struct.b_factor.mean()
 
             model_iteration_scores += [ref_avg_lddt]
 
@@ -734,51 +735,51 @@ class cas12fold_refinement_iterative_pipeline:
                     os.system(cmd)
                 except Exception as e:
                     print(e)
-        #
-        #     new_ranking_json_file = os.path.join(out_model_dir, "ranking_debug.json")
-        #     new_ranking_json = json.loads(open(new_ranking_json_file).read())
-        #     max_lddt_score = new_ranking_json["plddts"][list(new_ranking_json["order"])[0]]
-        #
-        #     print(f'#########Iteration: {num_iteration + 1}#############')
-        #     print(f"plddt before: {ref_avg_lddt}")
-        #     print(f"plddt after: {max_lddt_score}")
-        #     if max_lddt_score > ref_avg_lddt:
-        #         print("Continue to refine")
-        #         ref_start_pdb = os.path.join(out_model_dir, "ranked_0.pdb")
-        #         model_name = list(new_ranking_json["order"])[0]
-        #         ref_start_pkl = os.path.join(out_model_dir, f"result_{model_name}.pkl")
-        #         ref_start_msa = os.path.join(out_model_dir, 'msas', "monomer_final.a3m")
-        #         print('##################################################')
-        #         if num_iteration + 1 >= self.max_iteration:
-        #             print("Reach maximum iteration")
-        #             model_iteration_scores += [max_lddt_score]
-        #     else:
-        #         # keep the models in iteration 1 even through the plddt score decreases
-        #         if num_iteration == 0:
-        #             ref_start_pdb = os.path.join(out_model_dir, "ranked_0.pdb")
-        #             model_name = list(new_ranking_json["order"])[0]
-        #             ref_start_pkl = os.path.join(out_model_dir, f"result_{model_name}.pkl")
-        #             ref_start_msa = os.path.join(out_model_dir, 'msas', "monomer_final.a3m")
-        #             model_iteration_scores += [max_lddt_score]
-        #         break
-        #
-        # while len(model_iteration_scores) <= self.max_iteration:
-        #     model_iteration_scores += [0]
-        #
-        # print(model_iteration_scores)
-        # df = pd.DataFrame(model_iteration_scores)
-        # df.to_csv(os.path.join(outdir, 'summary.csv'))
-        #
-        # final_model_dir = os.path.join(outdir, 'final')
-        #
-        # makedir_if_not_exists(final_model_dir)
-        #
-        # os.system("cp " + ref_start_pdb + " " + os.path.join(final_model_dir, "final.pdb"))
-        # os.system("cp " + ref_start_pkl + " " + os.path.join(final_model_dir, "final.pkl"))
-        # os.system("cp " + ref_start_msa + " " + os.path.join(final_model_dir, "final.a3m"))
-        # os.chdir(cwd)
-        #
-        # return final_model_dir
+
+            new_ranking_json_file = os.path.join(out_model_dir, "ranking_debug.json")
+            new_ranking_json = json.loads(open(new_ranking_json_file).read())
+            max_lddt_score = new_ranking_json["plddts"][list(new_ranking_json["order"])[0]]
+
+            print(f'#########Iteration: {num_iteration + 1}#############')
+            print(f"plddt before: {ref_avg_lddt}")
+            print(f"plddt after: {max_lddt_score}")
+            if max_lddt_score > ref_avg_lddt:
+                print("Continue to refine")
+                ref_start_pdb = os.path.join(out_model_dir, "ranked_0.pdb")
+                model_name = list(new_ranking_json["order"])[0]
+                ref_start_pkl = os.path.join(out_model_dir, f"result_{model_name}.pkl")
+                ref_start_msa = os.path.join(out_model_dir, 'msas', "monomer_final.a3m")
+                print('##################################################')
+                if num_iteration + 1 >= self.max_iteration:
+                    print("Reach maximum iteration")
+                    model_iteration_scores += [max_lddt_score]
+            else:
+                # keep the models in iteration 1 even through the plddt score decreases
+                if num_iteration == 0:
+                    ref_start_pdb = os.path.join(out_model_dir, "ranked_0.pdb")
+                    model_name = list(new_ranking_json["order"])[0]
+                    ref_start_pkl = os.path.join(out_model_dir, f"result_{model_name}.pkl")
+                    ref_start_msa = os.path.join(out_model_dir, 'msas', "monomer_final.a3m")
+                    model_iteration_scores += [max_lddt_score]
+                break
+
+        while len(model_iteration_scores) <= self.max_iteration:
+            model_iteration_scores += [0]
+
+        print(model_iteration_scores)
+        df = pd.DataFrame(model_iteration_scores)
+        df.to_csv(os.path.join(outdir, 'summary.csv'))
+
+        final_model_dir = os.path.join(outdir, 'final')
+
+        makedir_if_not_exists(final_model_dir)
+
+        os.system("cp " + ref_start_pdb + " " + os.path.join(final_model_dir, "final.pdb"))
+        os.system("cp " + ref_start_pkl + " " + os.path.join(final_model_dir, "final.pkl"))
+        os.system("cp " + ref_start_msa + " " + os.path.join(final_model_dir, "final.a3m"))
+        os.chdir(cwd)
+
+        return final_model_dir
 
 
 # class cas12fold_refinement_iteration:
@@ -800,17 +801,14 @@ class cas12fold_refinement_iterative_pipeline:
 
 
 # cas12_iterative_refinement_pipeline_controller
-def cas12fold_refiner(params, refinement_input, outdir, finaldir, prefix, result_overwrite, gpu_device, template_select_foldseek_global):
-    pipeline = cas12fold_refinement_iterative_pipeline(params)
+def cas12fold_refiner(params, refinement_input, outdir, finaldir, prefix, result_overwrite, gpu_device,
+                      template_select_foldseek_global, max_iteration):
+    pipeline = cas12fold_refinement_iterative_pipeline(params, max_iteration=max_iteration)
     pipeline.search_single(fasta_path=refinement_input.fasta_path, pdb_path=refinement_input.pdb_path,
                            pkl_path=refinement_input.pkl_path, msa_path=refinement_input.msa_path,
                            outdir=os.path.join(outdir, pathlib.Path(refinement_input.pdb_path).stem),
                            result_overwrite=result_overwrite, gpu_device=gpu_device,
                            template_select_foldseek_global=template_select_foldseek_global)
-    # for refine_param in refinement_inputs:
-    #     pipeline.search_single(fasta_path=refine_param.fasta_path, pdb_path=refine_param.pdb_path,
-    #                            pkl_path=refine_param.pkl_path, msa_path=refine_param.msa_path,
-    #                            outdir=os.path.join(outdir, pathlib.Path(refine_param.pdb_path).stem))
 
 
     # pipeline = cas12fold_refinement_iteration(params=params)

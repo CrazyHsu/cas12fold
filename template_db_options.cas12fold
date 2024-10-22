@@ -23,40 +23,6 @@ hhsearch_program = YOUR_ENV/bin/hhsearch
 # kalign program path
 kalign_program = YOUR_ENV/bin/kalign
 
-# deepmsa2 program path
-deepmsa2_program = INSTALLDIR_TOOLS/deepmsa/hhsuite2/scripts/build_MSA2.py
-
-# tmalign program path
-tmalign_program = INSTALLDIR_TOOLS/tmalign/TMalign
-
-# mmalign program path
-mmalign_program = INSTALLDIR_TOOLS/mmalign/MMalign
-
-# dockq program
-dockq_program = INSTALLDIR_TOOLS/DockQ/DockQ.py
-
-# qscore program
-qscore_program = INSTALLDIR_TOOLS/pairwiseQA/q_score
-
-# tmscore program
-tmscore_program = INSTALLDIR_TOOLS/tmscore/TMscore
-
-# cif2pdb program
-cif2pdb_program = INSTALLDIR_TOOLS/cif2pdb
-
-# cif2pdb program
-pdb_selchain_program = /share/home/xufeng/Software/miniconda3/bin/pdb_selchain
-
-################################MSA generation tool###########################
-
-colabfold_search_program = INSTALLDIR_TOOLS/colabfold/search.py
-
-colabfold_split_msas_program = INSTALLDIR_TOOLS/colabfold/split_msas.py
-
-colabfold_databases = INSTALLDIR_DATABASES/colabfold
-
-mmseq_program = YOUR_ENV/bin/mmseqs
-
 ################################QA option#####################################
 
 #########################Customized alphafold program###########################
@@ -71,13 +37,8 @@ alphafold_database_dir = AFDB_DIR
 alphafold_program_dir = AF_DIR
 
 # alphafold tertiary structure prediction script
-alphafold_program = run_cas12fold_refiner.py
-
-# alphafold tertiary structure prediction script
-alphafold_multimer_program = run_alphafold_multimer_custom.py
-
-# alphafold tertiary structure prediction script
-alphafold_default_program = run_alphafold_pre.py
+# alphafold_program = run_cas12fold_refiner.py
+run_cas12fold_refiner_program = cas12fold_refiner/run_cas12fold_refiner.py
 
 # AlphaFold2 parameters
 monomer_num_ensemble = 1
@@ -100,8 +61,6 @@ models_to_relax = BEST
 
 max_template_date = 2099-01-01
 
-pdb_release_date_file = INSTALLDIR_DATABASES/pdb_release_date_filtered.csv
-
 ######################Monomer template search option#################################
 
 foldseek_program = /share/home/xufeng/Software/miniconda3/bin/foldseek
@@ -109,27 +68,26 @@ foldseek_program = /share/home/xufeng/Software/miniconda3/bin/foldseek
 foldcomp_program = /share/home/xufeng/Software/foldcomp
 
 #foldseek_pdb_database = INSTALLDIR_TOOLS/foldseek/databases/complex
-foldseek_pdb_database = /share/home/xufeng/Projects/run_foldseek/foldseek_mine_afdb50_with_cas12/cas12_mine_afdb50_res_pdbs/cas12_mine_afdb50_DB
+#foldseek_pdb_database = /share/home/xufeng/Projects/run_foldseek/foldseek_mine_afdb50_with_cas12/cas12_mine_afdb50_res_pdbs/cas12_mine_afdb50_DB
 rcsb_foldseek_database = /share/home/xufeng/Projects/run_foldseek/foldseek_mine_afdb50_with_cas12/rcsb_foldseek_db/rcsb_foldseek_db
 cas12_foldseek_database = /share/home/xufeng/Projects/run_foldseek/foldseek_mine_afdb50_with_cas12/cas12_mine_afdb50_res_pdbs/cas12_mine_afdb50_DB
-#afdb50_foldseek_database = /share/home/xufeng/Data/AFDB/afdb50_db/afdb50
-#foldseek_pdb_database = /share/home/xufeng/Data/AFDB/afdb50_db/afdb50
+afdb50_foldseek_database = /share/home/xufeng/Data/AFDB/afdb50_db/afdb50
 
 cas12_afdb50_foldcomp_database = /share/home/xufeng/Projects/run_foldseek/foldseek_mine_afdb50_with_cas12/cas12_mine_afdb50_res_pdbs/cas12_mine_afdb50_res_fcz/cas12_mine_afdb50_fcz
 
 #foldseek_pdb_database_dir = INSTALLDIR_DATABASES/pdb_complex/pdb
-foldseek_pdb_database_dir = ''
+#foldseek_pdb_database_dir = ''
 
 #foldseek_af_database = INSTALLDIR_TOOLS/foldseek/databases/af_db
-foldseek_af_database =
+#foldseek_af_database =
 
 #foldseek_af_database_dir = INSTALLDIR_DATABASES/af_pdbs
-foldseek_af_database_dir = ''
+#foldseek_af_database_dir = ''
 
 ######################Cas12fold database option#################################
 cas12folddb_database_path = /share/home/xufeng/Projects/af2_optimizm/cas12fold_test/batch_test_20240809/cas12.yu_zhang_JGI_afdb50.with_ruvc_tnpb.fa
 
-cas12folddb_template_database_path = /share/home/xufeng/Projects/run_foldseek/foldseek_mine_afdb50_with_cas12/cas12_mine_rcsb_hhdb/cas12_mine_rcsb
+cas12folddb_template_database_path = /share/home/xufeng/Projects/run_foldseek/foldseek_mine_afdb50_with_cas12/cas12_mine_rcsb_hhdb/cas12_mine_rcsb.20241021
 
 ################################databases option#####################################
 
@@ -141,9 +99,9 @@ template_mmcif_dir = AFDB_DIR/pdb_mmcif/mmcif_files/
 
 obsolete_pdbs_path = AFDB_DIR/pdb_mmcif/obsolete.dat
 
-metaclust_database = INSTALLDIR_DATABASES/Metaclust_2018_06/metaclust_50
+#metaclust_database = INSTALLDIR_DATABASES/Metaclust_2018_06/metaclust_50
 
-img_database = INSTALLDIR_DATABASES/img/img_new.fasta
+#img_database = INSTALLDIR_DATABASES/img/img_new.fasta
 
 ###########################Complex alignment generation option#######################
 
@@ -158,12 +116,6 @@ uniref_db = AFDB_DIR/uniref30/UniRef30_2021_03
 uniref90_fasta = AFDB_DIR/uniref90/uniref90.fasta
 
 uniprot_fasta = AFDB_DIR/uniprot/uniprot.fasta
-
-###########################UNIPROT TO PDB database option############################
-
-uniprot2pdb_mapping_file = INSTALLDIR_DATABASES/uniprot2pdb/uniprot2pdb.map
-
-complexes_list = INSTALLDIR_DATABASES/uniprot2pdb/complexes_cm.list
 
 ###########################STRING database option####################################
 
@@ -181,21 +133,5 @@ pdb70_hhsuite_database = AFDB_DIR/pdb70/pdb70
 pdb70_hhsuite_cluster_tsv = AFDB_DIR/pdb70/pdb70_clu.tsv
 
 pdb_seqs_dir = AFDB_DIR/pdb_seqres/pdb_seqs
-
-pdb_sort90_hhsuite_database = INSTALLDIR_DATABASES/pdb_sort90/hhsuitedb3
-
-pdb_sort90_hhsuite_cluster_tsv = INSTALLDIR_DATABASES/pdb_sort90/sort90_clust
-
-pdb_sort90_atom_dir = INSTALLDIR_DATABASES/pdb_sort90/pdb
-
-pdb_sort90_hmm_dir =INSTALLDIR_DATABASES/pdb_sort90/hmm
-
-complex_sort90_hhsuite_database = INSTALLDIR_DATABASES/pdb_complex/hhsuitedb3
-
-complex_sort90_hhsuite_cluster_tsv = INSTALLDIR_DATABASES/pdb_complex/sort90_clust
-
-complex_sort90_atom_dir = INSTALLDIR_DATABASES/pdb_complex/pdb
-
-complex_sort90_hmm_dir = INSTALLDIR_DATABASES/pdb_complex/hmm
 
 #######################End of Complex alignment generation option###################
