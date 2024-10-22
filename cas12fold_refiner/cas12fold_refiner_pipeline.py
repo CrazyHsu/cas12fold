@@ -623,7 +623,7 @@ class cas12fold_refinement_iterative_pipeline:
                 chain_id = rcsb_templates_copy.loc[rcsb_templates_copy.rcsb_id == template_pdb].rcsb_chain.unique()[0]
 
                 # os.system(f"cp {self.params['cas12_rcsb_database_dir']}/{template_pdb}.pdb {outdir}")
-                target_pdb_file = "{self.params['cas12_rcsb_pdb_dir']}/{template_pdb}.pdb"
+                target_pdb_file = f"{self.params['cas12_rcsb_pdb_dir']}/{template_pdb}.pdb"
                 if os.path.exists(target_pdb_file):
                     os.system(f"{self.params['pdb_selchain_program']} -{chain_id} {target_pdb_file} > {outdir}/{template_pdb}.pdb")
 
