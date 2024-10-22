@@ -116,6 +116,7 @@ cas12_foldseek_database = /share/home/xufeng/Projects/run_foldseek/foldseek_mine
 #foldseek_pdb_database = /share/home/xufeng/Data/AFDB/afdb50_db/afdb50
 
 cas12_afdb50_foldcomp_database = /share/home/xufeng/Projects/run_foldseek/foldseek_mine_afdb50_with_cas12/cas12_mine_afdb50_res_pdbs/cas12_mine_afdb50_res_fcz/cas12_mine_afdb50_fcz
+cas12_rcsb_pdb_dir = /share/home/xufeng/Projects/run_foldseek/foldseek_mine_afdb50_with_cas12/cas12_mine_rcsb_pdb
 
 #foldseek_pdb_database_dir = INSTALLDIR_DATABASES/pdb_complex/pdb
 foldseek_pdb_database_dir = ''
