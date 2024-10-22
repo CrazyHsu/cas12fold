@@ -144,3 +144,41 @@ ls /share/home/xufeng/Projects/af2_optimizm/cas12fold_test/batch_test_20240906/l
 done > run_105_low_plddt_cas12.remain.sh
 
 sbatch -J cas12_refiner --ntasks-per-node=9 ~/sbatch_submit_templates/sbatch_submit_rush.head.gpu01.sh run_105_low_plddt_cas12.remain.sh 20 9
+
+
+
+####################
+mkdir logs
+cas12_low_plddt_fa_dir="/share/home/xufeng/Projects/af2_optimizm/cas12fold_test/batch_test_20240719/cas12_low_plddt.new_name_split"
+
+j=0
+cat /share/home/xufeng/Projects/af2_optimizm/cas12fold_test/batch_test_20240719/cas12_low_plddt.new_name_mapping.low_rmdup.txt | cut -f 2 | while read line;do
+        fa_file="$cas12_low_plddt_fa_dir/$line.fa"
+        gpu=$(($j%4))
+        if [[ $gpu == 0 ]]; then
+            j=$(($j+1))
+            gpu=$(($j%4))
+        fi
+        j=$(($j+1))
+        echo -e "python run_cas12fold_controller.py --fasta_path $fa_file --gpu_device $gpu --option_file db_options --output_dir cas12_refine_test1 --run_cas12fold 1>logs/$line.log 2>&1"
+done > batch_run.cas12fold.sh
+
+j=0
+cat /share/home/xufeng/Projects/af2_optimizm/cas12fold_test/batch_test_20240719/cas12_low_plddt.new_name_mapping.low_rmdup.txt | cut -f 2 | while read line;do
+        gpu=$(($j%4))
+        if [[ $gpu == 0 ]]; then
+            j=$(($j+1))
+            gpu=$(($j%4))
+        fi
+        j=$(($j+1))
+        fa_file="$cas12_low_plddt_fa_dir/$line.fa"
+        msas_dir=$(realpath "cas12_refine_test1/$line/msas")
+        pdb_name=$(realpath "cas12_refine_test1/$line/ranked_0.pdb")
+        pkl_path=$(realpath "cas12_refine_test1/$line/result_model_1_pred_0.pkl")
+        echo -e "python run_cas12fold_refiner_controller.py --fasta_path $fa_file --msas_dir $msas_dir --option_file db_options --output_dir cas12_refine_test2 --pdb_name $line --pdb_path $pdb_path --pkl_path $pkl_path --gpu_device $gpu --result_overwrite 1>logs/$line.refiner.log 2>&1"
+#        echo -e "python run_cas12fold_controller.py --fasta_path $fa_file --gpu_device $gpu --option_file db_options --output_dir cas12_refine_test1 --run_cas12fold 1>logs/$line.log 2>&1"
+done > batch_run.cas12fold_refiner.sh
+
+#sbatch --ntasks-per-node=20 /share/home/xufeng/sbatch_submit_templates/sbatch_submit_rush.head.gpu01.sh batch_run.cas12fold.sh 53 5
+#sbatch --ntasks-per-node=20 /share/home/xufeng/sbatch_submit_templates/sbatch_submit_rush.tail.gpu02.sh batch_run.cas12fold.sh 52 5
+sbatch --ntasks-per-node=20 /share/home/xufeng/sbatch_submit_templates/sbatch_submit_rush.tail.gpu02.sh batch_run.cas12fold_refiner.sh 5 5
