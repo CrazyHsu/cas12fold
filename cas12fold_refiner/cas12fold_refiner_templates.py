@@ -30,10 +30,11 @@ from typing import Any, Dict, Mapping, Optional, Sequence, Tuple, List
 
 from absl import logging
 from alphafold.common import residue_constants
-from alphafold.data import mmcif_parsing
+# from alphafold.data import mmcif_parsing
 from alphafold.data import parsers
 from alphafold.data.tools import kalign
 import pdb_parsing
+import mmcif_parsing
 import numpy as np
 import pandas as pd
 
@@ -438,7 +439,7 @@ def _find_template_in_pdb(
 def _realign_pdb_template_to_query(
     old_template_sequence: str,
     template_chain_id: str,
-    mmcif_object: mmcif_parsing.MmcifObject,
+    pdb_object: pdb_parsing.PdbObject,
     old_mapping: Mapping[int, int],
     kalign_binary_path: str) -> Tuple[str, Mapping[int, int]]:
   """Aligns template from the mmcif_object to the query.
@@ -480,21 +481,21 @@ def _realign_pdb_template_to_query(
       old_template_sequence.
   """
   aligner = kalign.Kalign(binary_path=kalign_binary_path)
-  new_template_sequence = mmcif_object.chain_to_seqres.get(
+  new_template_sequence = pdb_object.chain_to_seqres.get(
       template_chain_id, '')
 
   # Sometimes the template chain id is unknown. But if there is only a single
   # sequence within the mmcif_object, it is safe to assume it is that one.
   if not new_template_sequence:
-    if len(mmcif_object.chain_to_seqres) == 1:
+    if len(pdb_object.chain_to_seqres) == 1:
       logging.info('Could not find %s in %s, but there is only 1 sequence, so '
                    'using that one.',
                    template_chain_id,
-                   mmcif_object.file_id)
-      new_template_sequence = list(mmcif_object.chain_to_seqres.values())[0]
+                   pdb_object.file_id)
+      new_template_sequence = list(pdb_object.chain_to_seqres.values())[0]
     else:
       raise QueryToTemplateAlignError(
-          f'Could not find chain {template_chain_id} in {mmcif_object.file_id}. '
+          f'Could not find chain {template_chain_id} in {pdb_object.file_id}. '
           'If there are no mmCIF parsing errors, it is possible it was not a '
           'protein chain.')
 
@@ -505,7 +506,7 @@ def _realign_pdb_template_to_query(
   except Exception as e:
     raise QueryToTemplateAlignError(
         'Could not align old template %s to template %s (%s_%s). Error: %s' %
-        (old_template_sequence, new_template_sequence, mmcif_object.file_id,
+        (old_template_sequence, new_template_sequence, pdb_object.file_id,
          template_chain_id, str(e)))
 
   logging.info('Old aligned template: %s\nNew aligned template: %s',
@@ -534,7 +535,7 @@ def _realign_pdb_template_to_query(
         'actual sequence in the mmCIF file %s_%s: %s. We require at least '
         '90 %% similarity wrt to the shorter of the sequences. This is not a '
         'problem unless you think this is a template that should be included.' %
-        (old_template_sequence, mmcif_object.file_id, template_chain_id,
+        (old_template_sequence, pdb_object.file_id, template_chain_id,
          new_template_sequence))
 
   new_query_to_template_mapping = {}
@@ -569,14 +570,14 @@ def _check_residue_distances(all_positions: np.ndarray,
 
 
 def _get_atom_positions(
-    mmcif_object: mmcif_parsing.MmcifObject,
+    pdb_object: pdb_parsing.PdbObject,
     auth_chain_id: str,
     max_ca_ca_distance: float) -> Tuple[np.ndarray, np.ndarray]:
   """Gets atom positions and mask from a list of Biopython Residues."""
   # num_res = len(mmcif_object.chain_to_seqres[auth_chain_id])
-  num_res = len(mmcif_object.seqres_to_structure[auth_chain_id])
+  num_res = len(pdb_object.seqres_to_structure[auth_chain_id])
 
-  relevant_chains = [c for c in mmcif_object.structure.get_chains()
+  relevant_chains = [c for c in pdb_object.structure.get_chains()
                      if c.id == auth_chain_id]
   if len(relevant_chains) != 1:
     raise MultipleChainsError(
@@ -589,7 +590,7 @@ def _get_atom_positions(
   for res_index in range(num_res):
     pos = np.zeros([residue_constants.atom_type_num, 3], dtype=np.float32)
     mask = np.zeros([residue_constants.atom_type_num], dtype=np.float32)
-    res_at_position = mmcif_object.seqres_to_structure[auth_chain_id][res_index]
+    res_at_position = pdb_object.seqres_to_structure[auth_chain_id][res_index]
     if not res_at_position.is_missing:
       res = chain[(res_at_position.hetflag,
                    res_at_position.position.residue_number,
@@ -1077,16 +1078,28 @@ def _process_single_hit(
     # remove gaps (which regardless have a missing confidence score).
     template_sequence = monomer_hit.aln_temp.replace('-', '')
 
-    pdb_path = os.path.join(atom_dir, monomer_hit.template_name + '.atom')
+    if "AF" in monomer_hit.template_name:
+        pdb_path = os.path.join(atom_dir, monomer_hit.template_name + '.atom')
 
-    logging.debug('Reading PDB entry from %s. Query: %s, template: %s', pdb_path,
-                  query_sequence, template_sequence)
-    # Fail if we can't find the mmCIF file.
-    pdb_string = _read_file(pdb_path)
+        logging.debug('Reading PDB entry from %s. Query: %s, template: %s', pdb_path,
+                      query_sequence, template_sequence)
+        # Fail if we can't find the mmCIF file.
+        pdb_string = _read_file(pdb_path)
 
-    parsing_result = pdb_parsing.parse(file_id=monomer_hit.template_name,
-                                       chain_id=monomer_hit.template_chain,
-                                       pdb_string=pdb_string)
+        parsing_result = pdb_parsing.parse(file_id=monomer_hit.template_name,
+                                           chain_id=monomer_hit.template_chain,
+                                           pdb_string=pdb_string)
+    else:
+        cif_path = os.path.join(atom_dir, monomer_hit.template_name + '.atom')
+
+        logging.debug('Reading PDB entry from %s. Query: %s, template: %s', cif_path,
+                      query_sequence, template_sequence)
+        # Fail if we can't find the mmCIF file.
+        cif_string = _read_file(cif_path)
+
+        parsing_result = mmcif_parsing.parse(file_id=monomer_hit.template_name,
+                                             chain_id=monomer_hit.template_chain,
+                                             mmcif_string=cif_string)
 
     try:
         features, realign_warning = _extract_template_features(
@@ -1196,7 +1209,6 @@ class CustomizedMonomerHitFeaturizer:
             if num_hits >= self._max_hits:
                 break
 
-            template_chain = 'A'
             if "AF" not in pdb_hits_pd.loc[i, 'target']:
                 target = pdb_hits_pd.loc[i, 'target']
                 template_name = target.split(".")[0].split("_")[0]
@@ -1204,6 +1216,7 @@ class CustomizedMonomerHitFeaturizer:
             else:
                 target = pdb_hits_pd.loc[i, 'target']
                 template_name = target.split(".")[0]
+                template_chain = 'A'
             # from_pdb = pdb_hits_pd.loc[i, 'target'].find('.atom.gz') > 0
             # if from_pdb:
             #     template_chain = pdb_hits_pd.loc[i, 'target'][4]
@@ -1236,13 +1249,18 @@ class CustomizedMonomerHitFeaturizer:
             #     add_chain_info_to_atom_file(infile=atom_file,
             #                                 chainid=hit.template_chain,
             #                                 outfile=os.path.join(template_pdb_dir, hit.template_name + '.atom'))
-            atom_file = os.path.join(self._input_pdb_dir, hit.template_name + ".pdb")
-            if not os.path.exists(atom_file):
-                atom_file = os.path.join(self._input_pdb_dir, hit.template_name + ".atom")
-
-            add_chain_info_to_atom_file(infile=atom_file,
-                                        chainid=hit.template_chain,
-                                        outfile=os.path.join(template_pdb_dir, hit.template_name + '.atom'))
+            if "AF" in hit.template_name:
+                atom_file = os.path.join(self._input_pdb_dir, hit.template_name + ".pdb")
+            else:
+                atom_file = os.path.join(self._input_pdb_dir, hit.template_name + ".cif")
+            os.system(f"cp {atom_file} {template_pdb_dir}/{hit.template_name}.atom")
+            # atom_file = os.path.join(self._input_pdb_dir, hit.template_name + ".pdb")
+            # if not os.path.exists(atom_file):
+            #     atom_file = os.path.join(self._input_pdb_dir, hit.template_name + ".atom")
+            #
+            # add_chain_info_to_atom_file(infile=atom_file,
+            #                             chainid=hit.template_chain,
+            #                             outfile=os.path.join(template_pdb_dir, hit.template_name + '.atom'))
 
             result = _process_single_hit(query_sequence=query_sequence,
                                          monomer_hit=hit,
@@ -1280,76 +1298,76 @@ class CustomizedMonomerHitFeaturizer:
         return TemplateSearchResult(features=template_features, hits_features=hits_features,
                                     errors=errors, warnings=warnings)
 
-    def get_templates_alphafold(self,
-                                targetname: str,
-                                query_sequence: str,
-                                template_pdb_dir: str) -> TemplateSearchResult:
-
-        """Computes the templates for given query sequence (more details above)."""
-        logging.info('Searching for template for: %s', query_sequence)
-
-        template_features = {}
-        for template_feature_name in TEMPLATE_FEATURES:
-            template_features[template_feature_name] = []
-
-        num_hits = 0
-        errors = []
-        warnings = []
-        indices_map = []
-        hits_features = []
-
-        for n in range(0, self._max_hits):
-
-            hit = CustomizedTemplateHit(query_name=targetname,
-                                        template_name=targetname + f'_{n}',
-                                        template_chain=targetname[4],
-                                        aligned_length=len(query_sequence),
-                                        aln_temp=query_sequence,
-                                        tstart=1,
-                                        tend=len(query_sequence),
-                                        aln_query=query_sequence,
-                                        qstart=1,
-                                        qend=len(query_sequence),
-                                        from_predicted_structure=True)
-
-            # add chain info to the original atom file
-
-            add_chain_info_to_atom_file(infile=os.path.join(self._input_pdb_dir, f'ranked_{n}.pdb'),
-                                        chainid=hit.template_chain,
-                                        outfile=os.path.join(template_pdb_dir, hit.template_name + '.atom'))
-
-            result = _process_single_hit(query_sequence=query_sequence,
-                                         monomer_hit=hit,
-                                         atom_dir=template_pdb_dir,
-                                         kalign_binary_path=self._kalign_binary_path,
-                                         strict_error_check=self._strict_error_check)
-
-            if result.error:
-                errors.append(result.error)
-
-            # There could be an error even if there are some results, e.g. thrown by
-            # other unparsable chains in the same mmCIF file.
-            if result.warning:
-                warnings.append(result.warning)
-
-            if result.features is None:
-                logging.info('Skipped invalid hit %s, error: %s, warning: %s',
-                             hit.template_name, result.error, result.warning)
-            else:
-                # Increment the hit counter, since we got features out of this hit.
-                indices_map.append(num_hits)
-                num_hits += 1
-                for k in template_features:
-                    template_features[k].append(result.features[k])
-                hits_features += [result.features]
-
-        for name in template_features:
-            if num_hits > 0:
-                template_features[name] = np.stack(
-                    template_features[name], axis=0).astype(TEMPLATE_FEATURES[name])
-            else:
-                # Make sure the feature has correct dtype even if empty.
-                template_features[name] = np.array([], dtype=TEMPLATE_FEATURES[name])
-
-        return TemplateSearchResult(features=template_features, hits_features=hits_features,
-                                    errors=errors, warnings=warnings)
+    # def get_templates_alphafold(self,
+    #                             targetname: str,
+    #                             query_sequence: str,
+    #                             template_pdb_dir: str) -> TemplateSearchResult:
+    #
+    #     """Computes the templates for given query sequence (more details above)."""
+    #     logging.info('Searching for template for: %s', query_sequence)
+    #
+    #     template_features = {}
+    #     for template_feature_name in TEMPLATE_FEATURES:
+    #         template_features[template_feature_name] = []
+    #
+    #     num_hits = 0
+    #     errors = []
+    #     warnings = []
+    #     indices_map = []
+    #     hits_features = []
+    #
+    #     for n in range(0, self._max_hits):
+    #
+    #         hit = CustomizedTemplateHit(query_name=targetname,
+    #                                     template_name=targetname + f'_{n}',
+    #                                     template_chain=targetname[4],
+    #                                     aligned_length=len(query_sequence),
+    #                                     aln_temp=query_sequence,
+    #                                     tstart=1,
+    #                                     tend=len(query_sequence),
+    #                                     aln_query=query_sequence,
+    #                                     qstart=1,
+    #                                     qend=len(query_sequence),
+    #                                     from_predicted_structure=True)
+    #
+    #         # add chain info to the original atom file
+    #
+    #         add_chain_info_to_atom_file(infile=os.path.join(self._input_pdb_dir, f'ranked_{n}.pdb'),
+    #                                     chainid=hit.template_chain,
+    #                                     outfile=os.path.join(template_pdb_dir, hit.template_name + '.atom'))
+    #
+    #         result = _process_single_hit(query_sequence=query_sequence,
+    #                                      monomer_hit=hit,
+    #                                      atom_dir=template_pdb_dir,
+    #                                      kalign_binary_path=self._kalign_binary_path,
+    #                                      strict_error_check=self._strict_error_check)
+    #
+    #         if result.error:
+    #             errors.append(result.error)
+    #
+    #         # There could be an error even if there are some results, e.g. thrown by
+    #         # other unparsable chains in the same mmCIF file.
+    #         if result.warning:
+    #             warnings.append(result.warning)
+    #
+    #         if result.features is None:
+    #             logging.info('Skipped invalid hit %s, error: %s, warning: %s',
+    #                          hit.template_name, result.error, result.warning)
+    #         else:
+    #             # Increment the hit counter, since we got features out of this hit.
+    #             indices_map.append(num_hits)
+    #             num_hits += 1
+    #             for k in template_features:
+    #                 template_features[k].append(result.features[k])
+    #             hits_features += [result.features]
+    #
+    #     for name in template_features:
+    #         if num_hits > 0:
+    #             template_features[name] = np.stack(
+    #                 template_features[name], axis=0).astype(TEMPLATE_FEATURES[name])
+    #         else:
+    #             # Make sure the feature has correct dtype even if empty.
+    #             template_features[name] = np.array([], dtype=TEMPLATE_FEATURES[name])
+    #
+    #     return TemplateSearchResult(features=template_features, hits_features=hits_features,
+    #                                 errors=errors, warnings=warnings)

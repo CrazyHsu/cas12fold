@@ -618,14 +618,15 @@ class cas12fold_refinement_iterative_pipeline:
             rcsb_templates_copy = copy.deepcopy(rcsb_templates)
             rcsb_templates_copy[["rcsb_id", "rcsb_chain"]] = rcsb_templates_copy.target_id.str.split('_', n=1, expand=True)
             for template_pdb in rcsb_templates_copy.rcsb_id.unique():
-                # template_cif_path = os.path.join(self.params['template_mmcif_dir'], f"{template_pdb}.cif")
+                template_cif_path = os.path.join(self.params['template_mmcif_dir'], f"{template_pdb}.cif")
+                os.system(f"cp {template_cif_path} {outdir}")
                 # template_pdb_path = f"{outdir}/{template_pdb}.pdb"
-                chain_id = rcsb_templates_copy.loc[rcsb_templates_copy.rcsb_id == template_pdb].rcsb_chain.unique()[0]
-
-                # os.system(f"cp {self.params['cas12_rcsb_database_dir']}/{template_pdb}.pdb {outdir}")
-                target_pdb_file = f"{self.params['cas12_rcsb_pdb_dir']}/{template_pdb}.pdb"
-                if os.path.exists(target_pdb_file):
-                    os.system(f"{self.params['pdb_selchain_program']} -{chain_id} {target_pdb_file} > {outdir}/{template_pdb}.pdb")
+                # chain_id = rcsb_templates_copy.loc[rcsb_templates_copy.rcsb_id == template_pdb].rcsb_chain.unique()[0]
+                #
+                # # os.system(f"cp {self.params['cas12_rcsb_database_dir']}/{template_pdb}.pdb {outdir}")
+                # target_pdb_file = f"{self.params['cas12_rcsb_pdb_dir']}/{template_pdb}.pdb"
+                # if os.path.exists(target_pdb_file):
+                #     os.system(f"{self.params['pdb_selchain_program']} -{chain_id} {target_pdb_file} > {outdir}/{template_pdb}.pdb")
 
                 # pdbl = PDBList(server='http://files.wwpdb.org')
                 # if not os.path.exists(f"{outdir}/pdb{template_pdb}.ent"):
