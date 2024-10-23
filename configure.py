@@ -30,7 +30,7 @@ if __name__ == '__main__':
     keywords_dict = {'YOUR_ENV': os.path.abspath(args.conda_env_dir.rstrip('/')),
                      'CAS12FOLD_DIR': os.path.abspath(args.install_dir.rstrip(' / ')),
                      # 'INSTALLDIR_TOOLS': args.tools_dir.rstrip('/'),
-                     'AF2DB_DIR': args.afdb_dir.rstrip('/')}
+                     'AF2DB_DIR': args.af2db_dir.rstrip('/')}
 
     for line in open(template_option_file):
         newline = line

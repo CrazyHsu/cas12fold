@@ -93,7 +93,7 @@ Additional databases will be used for the Cas12Fold prediction process which can
 ### Configure the parameters
 Before run Cas12Fold, please generate `db_options` by using `configure.py`:
 ```bash
-python configure.py \ 
+python configure.py \
   --template_option_file template_db_options \
   --conda_env_dir <conda_env> \
   --install_dir <path_to_Cas12Fold> \
