@@ -16,11 +16,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--template_option_file', type=str, required=True)
     parser.add_argument('--conda_env_dir', type=str, required=True)
-    # parser.add_argument('--install_dir', type=str, required=True)
+    parser.add_argument('--install_dir', type=str, required=True)
     # parser.add_argument('--multicom3_db_dir', type=str, required=True)
-    parser.add_argument('--tools_dir', type=str, required=True)
-    parser.add_argument('--afdb_dir', type=str, required=True)
-    parser.add_argument('--af2_dir', type=str, required=True)
+    # parser.add_argument('--tools_dir', type=str, required=True)
+    parser.add_argument('--af2db_dir', type=str, required=True)
+    # parser.add_argument('--af2_dir', type=str, required=True)
     parser.add_argument('--out_option_file', default="option_file", type=str, required=False)
     args = parser.parse_args()
 
@@ -28,9 +28,9 @@ if __name__ == '__main__':
     template_option_file = args.template_option_file
     newlines = []
     keywords_dict = {'YOUR_ENV': os.path.abspath(args.conda_env_dir.rstrip('/')),
-                     'INSTALLDIR_TOOLS': args.tools_dir.rstrip('/'),
-                     'AFDB_DIR': args.afdb_dir.rstrip('/'),
-                     'AF_DIR': args.af2_dir.rstrip('/')}
+                     'CAS12FOLD_DIR': os.path.abspath(args.install_dir.rstrip(' / ')),
+                     # 'INSTALLDIR_TOOLS': args.tools_dir.rstrip('/'),
+                     'AF2DB_DIR': args.afdb_dir.rstrip('/')}
 
     for line in open(template_option_file):
         newline = line

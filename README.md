@@ -65,12 +65,13 @@ cd ~/miniconda3/envs/af23/lib/python3.8/site-packages/ && patch -p0 < $MULTICOM3
 
 ### **Download required databases**
 ```bash
-bash download_dbs.sh -d </home/crazyyhsu/alphafold_data>
+bash download_af2_dbs.sh -d </home/crazyyhsu/alphafold_data>
 ```
+---
 
-## **Genetic databases used by Cas12Fold*
+## **Genetic databases used by Cas12Fold**
 
-Assume the following databases have been installed as a part of the AlphaFold2/AlphaFold-Multimer installation
+Assume the following databases have been installed as a part of the AlphaFold2 installation
 *   [BFD](https://bfd.mmseqs.com/),
 *   [MGnify](https://www.ebi.ac.uk/metagenomics/),
 *   [PDB70](http://wwwuser.gwdg.de/~compbiol/data/hhsuite/databases/hhsuite_dbs/),
@@ -86,6 +87,60 @@ Additional databases will be used for the Cas12Fold prediction process which can
 *   **Cas12FoldDB template hhdatabase**: A hhdatabase built with the result by aligning Cas12FoldDB to RCSB FoldSeek database using FoldSeek. 
 *   **Cas12FoldDB-based AFDB50 FoldSeek database**: A FoldSeek database built with a subset of AFDB50 by aligning the structures of Cas12FoldDB to AFDB50 FoldSeek database using FoldSeek.
 *   **Cas12FoldDB-based AFDB50 FoldComp database**: A FoldComp database built with PDBs which used to build Cas12FoldDB-based AFDB50 FoldSeek database
+---
 
+## Run Cas12Fold
+### Configure the parameters
+Before run Cas12Fold, please generate `db_options` by using `configure.py`:
+```bash
+python configure.py \ 
+  --template_option_file template_db_options \
+  --conda_env_dir <conda_env> \
+  --install_dir <path_to_Cas12Fold> \
+  --af2db_dir <path_to_dir_contains_AF2_dbs> \
+  --out_option_file db_options
+```
+More parameters can be modified directly in the `db_options`.
 
+### Run Cas12Fold with `run_af2_wt` mode
+```bash
+fasta_file="examples/8DC2.fa"
+python run_cas12fold_controller.py \
+  --fasta_path $fasta_file \
+  --gpu_device 0 \
+  --option_file db_options \
+  --output_dir af2_cas12_pred \
+  --run_af2_wt \
+  --af2_use_precomputed_msas
+```
 
+### Run Cas12Fold with `cas12fold` mode
+```bash
+fasta_file="examples/8DC2.fa"
+python run_cas12fold_controller.py \
+  --fasta_path $fasta_file \
+  --gpu_device 0 \
+  --option_file db_options \
+  --output_dir cas12fold_cas12_pred \
+  --run_cas12fold \
+  --af2_use_precomputed_msas
+```
+
+### Run Cas12Fold with `refine` mode based on the results of `cas12fold` mode
+```bash
+name="8DC2"
+fasta_file="examples/$name.fa"
+msas_dir=$(realpath "cas12fold_cas12_pred/$name/msas")
+pdb_path=$(realpath "cas12fold_cas12_pred/$name/ranked_0.pdb")
+pkl_path=$(realpath "cas12fold_cas12_pred/$name/result_model_1_pred_0.pkl")
+python run_cas12fold_refiner_controller.py \
+  --fasta_path $fasta_file \
+  --msas_dir $msas_dir \
+  --option_file db_options \
+  --output_dir cas12fold_refine_cas12_pred \
+  --pdb_name $name \
+  --pdb_path $pdb_path \
+  --pkl_path $pkl_path \
+  --gpu_device 0 \
+  --result_overwrite
+```
