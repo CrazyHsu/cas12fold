@@ -16,6 +16,19 @@ python configure.py \
   --out_option_file db_options
 ```
 
+### 运行AlphaFold2
+```bash
+
+fasta_file="examples/8DC2.fa"
+python run_cas12fold_controller.py \
+  --fasta_path $fasta_file \
+  --gpu_device 0 \
+  --option_file db_options \
+  --output_dir af2_cas12_pred \
+  --run_af2_wt \
+  --af2_use_precomputed_msas
+```
+
 ### 运行Cas12Fold
 ```bash
 
@@ -52,7 +65,12 @@ python run_cas12fold_refiner_controller.py \
 ### 打印预测pdb的平均pLDDT值
 ```bash
 name="8DC2"
+python cal_mean_plddt.py alphafold2_cas12_pred/$name/ranked_0.pdb
+python cal_mean_plddt.py cas12fold_cas12_pred/$name/ranked_0.pdb
 python cal_mean_plddt.py cas12fold_refine_cas12_pred/$name/iteration1/alphafold/ranked_0.pdb
-# cas12fold_refine_cas12_pred/8DC2/iteration1/alphafold/ranked_0.pdb  92.8979286007386```
+# af2_cas12_pred/8DC2/ranked_0.pdb  57.29467788264259
+# cas12fold_cas12_pred/8DC2/ranked_0.pdb    90.36121050471893
+# cas12fold_refine_cas12_pred/8DC2/iteration1/alphafold/ranked_0.pdb        92.8979286007386
+```
 
 
