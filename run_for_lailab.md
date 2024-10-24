@@ -49,5 +49,10 @@ python run_cas12fold_refiner_controller.py \
   --result_overwrite
 ```
 
+### 打印预测pdb的平均pLDDT值
+```bash
+name="8DC2"
+python cal_mean_plddt.py cas12fold_refine_cas12_pred/$name/iteration1/alphafold/ranked_0.pdb
+# cas12fold_refine_cas12_pred/8DC2/iteration1/alphafold/ranked_0.pdb  92.8979286007386```
 
 
