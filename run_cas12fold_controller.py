@@ -64,7 +64,7 @@ def main(argv):
     makedir_if_not_exists(outdir)
 
     if FLAGS.run_af2_wt:
-        run_af2_cmd = "python alphafold_custom/run_alphafold.py"
+        run_af2_cmd = f"python {params['run_alphafold_program']}"
         run_af2_cmd += f" --fasta_paths={FLAGS.fasta_path}"
         run_af2_cmd += f" --output_dir={outdir}"
         run_af2_cmd += f" --hhblits_binary_path={params['hhblits_program']}"
@@ -97,7 +97,7 @@ def main(argv):
             cas12folddb_merge_mode = "single"
         else:
             cas12folddb_merge_mode = "merge"
-        run_cas12fold_cmd = "python cas12fold/run_cas12fold.py"
+        run_cas12fold_cmd = f"python {params['run_cas12fold_program']}"
         run_cas12fold_cmd += f" --fasta_paths={FLAGS.fasta_path}"
         run_cas12fold_cmd += f" --output_dir={outdir}"
         run_cas12fold_cmd += f" --hhblits_binary_path={params['hhblits_program']}"

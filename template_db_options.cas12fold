@@ -38,6 +38,8 @@ alphafold_env_dir = YOUR_ENV/bin/
 alphafold_database_dir = AF2DB_DIR
 
 # alphafold tertiary structure prediction script
+run_alphafold_program = CAS12FOLD_DIR/alphafold_custom/run_alphafold.py
+run_cas12fold_program = CAS12FOLD_DIR/cas12fold/run_cas12fold.py
 run_cas12fold_refiner_program = CAS12FOLD_DIR/cas12fold_refiner/run_cas12fold_refiner.py
 
 # AlphaFold2 parameters
