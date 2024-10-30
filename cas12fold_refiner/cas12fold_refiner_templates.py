@@ -1160,6 +1160,14 @@ def add_chain_info_to_atom_file(infile, chainid, outfile):
             out.write(line[:21] + chainid + line[22:])
 
 
+def get_chain_ids_from_cif(cif_file_path):
+    from Bio.PDB import MMCIFParser
+    parser = MMCIFParser(QUIET=True)
+    structure = parser.get_structure("protein", cif_file_path)
+    chain_ids = [chain.id for chain in structure.get_chains()]
+    return chain_ids
+
+
 class CustomizedMonomerHitFeaturizer:
     """A class for turning a3m hits from hmmsearch to template features."""
 
@@ -1211,8 +1219,13 @@ class CustomizedMonomerHitFeaturizer:
 
             if "AF" not in pdb_hits_pd.loc[i, 'target']:
                 target = pdb_hits_pd.loc[i, 'target']
-                template_name = target.split(".")[0].split("_")[0]
-                template_chain = target.split(".")[0].split("_")[1]
+                if "_" in target:
+                    template_name = target.split(".")[0].split("_")[0]
+                    template_chain = target.split(".")[0].split("_")[1]
+                else:
+                    template_name = target
+                    atom_file = os.path.join(self._input_pdb_dir, template_name + ".cif")
+                    template_chain = get_chain_ids_from_cif(atom_file)[0]
             else:
                 target = pdb_hits_pd.loc[i, 'target']
                 template_name = target.split(".")[0]
