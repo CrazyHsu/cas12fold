@@ -1223,7 +1223,7 @@ class CustomizedMonomerHitFeaturizer:
                     template_name = target.split(".")[0].split("_")[0]
                     template_chain = target.split(".")[0].split("_")[1]
                 else:
-                    template_name = target
+                    template_name = target.split(".")[0]
                     atom_file = os.path.join(self._input_pdb_dir, template_name + ".cif")
                     template_chain = get_chain_ids_from_cif(atom_file)[0]
             else:
