@@ -196,7 +196,8 @@ def predict_structure(
         random_seed,
         models_to_relax,
         template_select_foldseek_global,
-        result_overwrite):
+        result_overwrite,
+        max_subsequence_ratio=0.95):
     """Predicts structure using AlphaFold for the given sequence."""
 
     logging.info('Predicting %s', fasta_name)
@@ -218,7 +219,8 @@ def predict_structure(
         msa_output_dir=msa_output_dir,
         template_output_dir=template_output_dir,
         custom_inputs=custom_inputs,
-        template_select_foldseek_global=template_select_foldseek_global)
+        template_select_foldseek_global=template_select_foldseek_global,
+        max_subsequence_ratio=max_subsequence_ratio)
     timings['features'] = time.time() - t_0
 
     # Write out features as a pickled dictionary.
@@ -464,7 +466,8 @@ def main(argv):
         random_seed=random_seed,
         models_to_relax=FLAGS.models_to_relax,
         template_select_foldseek_global=FLAGS.template_select_foldseek_global,
-        result_overwrite=FLAGS.result_overwrite)
+        result_overwrite=FLAGS.result_overwrite,
+        max_subsequence_ratio=FLAGS.max_subsequence_ratio)
 
 
 if __name__ == '__main__':

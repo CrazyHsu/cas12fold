@@ -151,7 +151,8 @@ class DataPipeline:
     self.uniref_max_hits = uniref_max_hits
     self.use_precomputed_msas = use_precomputed_msas
 
-  def process(self, input_fasta_path: str, msa_output_dir: str, cas12folddb_merge_mode: str) -> FeatureDict:
+  def process(self, input_fasta_path: str, msa_output_dir: str, cas12folddb_merge_mode: str,
+              max_subsequence_ratio: float = 0.95) -> FeatureDict:
     """Runs alignment tools on the input sequence and creates features."""
     with open(input_fasta_path) as f:
       input_fasta_str = f.read()
@@ -242,7 +243,8 @@ class DataPipeline:
 
         templates_result = self.template_featurizer.get_templates(
             query_sequence=input_sequence,
-            hits=pdb_template_hits)
+            hits=pdb_template_hits,
+            max_subsequence_ratio=max_subsequence_ratio)
 
         sequence_features = make_sequence_features(
             sequence=input_sequence,
@@ -340,7 +342,8 @@ class DataPipeline:
 
         templates_result = self.template_featurizer.get_templates(
             query_sequence=input_sequence,
-            hits=pdb_template_hits)
+            hits=pdb_template_hits,
+            max_subsequence_ratio=max_subsequence_ratio)
 
         sequence_features = make_sequence_features(
             sequence=input_sequence,

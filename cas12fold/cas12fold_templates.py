@@ -691,7 +691,8 @@ def _process_single_hit(
     release_dates: Mapping[str, datetime.datetime],
     obsolete_pdbs: Mapping[str, Optional[str]],
     kalign_binary_path: str,
-    strict_error_check: bool = False) -> SingleHitResult:
+    strict_error_check: bool = False,
+    max_subsequence_ratio: float = 0.95) -> SingleHitResult:
   """Tries to extract template features from a single HHSearch hit."""
   # Fail hard if we can't get the PDB ID and chain name from the hit.
   hit_pdb_code, hit_chain_id = _get_pdb_id_and_chain(hit)
@@ -713,7 +714,7 @@ def _process_single_hit(
         query_sequence=query_sequence,
         release_dates=release_dates,
         release_date_cutoff=max_template_date,
-        max_subsequence_ratio=1)
+        max_subsequence_ratio=max_subsequence_ratio)
   except PrefilterError as e:
     msg = f'hit {hit_pdb_code}_{hit_chain_id} did not pass prefilter: {str(e)}'
     logging.info(msg)
@@ -864,7 +865,8 @@ class TemplateHitFeaturizer(abc.ABC):
   def get_templates(
       self,
       query_sequence: str,
-      hits: Sequence[parsers.TemplateHit]) -> TemplateSearchResult:
+      hits: Sequence[parsers.TemplateHit],
+      max_subsequence_ratio: float = 0.95) -> TemplateSearchResult:
     """Computes the templates for given query sequence."""
 
 
@@ -874,7 +876,8 @@ class HhsearchHitFeaturizer(TemplateHitFeaturizer):
   def get_templates(
       self,
       query_sequence: str,
-      hits: Sequence[parsers.TemplateHit]) -> TemplateSearchResult:
+      hits: Sequence[parsers.TemplateHit],
+      max_subsequence_ratio: float = 0.95) -> TemplateSearchResult:
     """Computes the templates for given query sequence (more details above)."""
     logging.info('Searching for template for: %s', query_sequence)
 
@@ -899,7 +902,8 @@ class HhsearchHitFeaturizer(TemplateHitFeaturizer):
           release_dates=self._release_dates,
           obsolete_pdbs=self._obsolete_pdbs,
           strict_error_check=self._strict_error_check,
-          kalign_binary_path=self._kalign_binary_path)
+          kalign_binary_path=self._kalign_binary_path,
+          max_subsequence_ratio=max_subsequence_ratio)
 
       if result.error:
         errors.append(result.error)
@@ -936,7 +940,8 @@ class HmmsearchHitFeaturizer(TemplateHitFeaturizer):
   def get_templates(
       self,
       query_sequence: str,
-      hits: Sequence[parsers.TemplateHit]) -> TemplateSearchResult:
+      hits: Sequence[parsers.TemplateHit],
+      max_subsequence_ratio: float = 0.95) -> TemplateSearchResult:
     """Computes the templates for given query sequence (more details above)."""
     logging.info('Searching for template for: %s', query_sequence)
 
@@ -966,7 +971,8 @@ class HmmsearchHitFeaturizer(TemplateHitFeaturizer):
           release_dates=self._release_dates,
           obsolete_pdbs=self._obsolete_pdbs,
           strict_error_check=self._strict_error_check,
-          kalign_binary_path=self._kalign_binary_path)
+          kalign_binary_path=self._kalign_binary_path,
+          max_subsequence_ratio=max_subsequence_ratio)
 
       if result.error:
         errors.append(result.error)

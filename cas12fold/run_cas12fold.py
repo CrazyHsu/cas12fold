@@ -158,7 +158,7 @@ flags.DEFINE_enum_class('cas12folddb_merge_mode', default=Cas12folddbMergeMode.b
 flags.DEFINE_string('cas12folddb_database_path', default=None, help="Path to the cas12folddb for use by JackHMMER.")
 flags.DEFINE_string('cas12folddb_template_database_path', default=None,
                     help="Path to the cas12folddb template database for use by HHsearch.")
-
+flags.DEFINE_float('max_subsequence_ratio', default=1, help="The max subsequence ratio used to filter pdb hits")
 
 FLAGS = flags.FLAGS
 
@@ -199,7 +199,8 @@ def predict_structure(
     benchmark: bool,
     random_seed: int,
     models_to_relax: ModelsToRelax,
-    cas12folddb_merge_mode: Cas12folddbMergeMode):
+    cas12folddb_merge_mode: Cas12folddbMergeMode,
+    max_subsequence_ratio: float = 0.95):
   """Predicts structure using AlphaFold for the given sequence."""
   logging.info('Predicting %s', fasta_name)
   timings = {}
@@ -221,7 +222,8 @@ def predict_structure(
   feature_dict = data_pipeline.process(
       input_fasta_path=fasta_path,
       msa_output_dir=msa_output_dir,
-      cas12folddb_merge_mode=cas12folddb_merge_mode)
+      cas12folddb_merge_mode=cas12folddb_merge_mode,
+      max_subsequence_ratio=max_subsequence_ratio)
   timings['features'] = time.time() - t_0
 
   # Write out features as a pickled dictionary.
@@ -397,9 +399,14 @@ def main(argv):
         release_dates_path=None,
         obsolete_pdbs_path=FLAGS.obsolete_pdbs_path)
   else:
-    template_searcher = hhsearch.HHSearch(
-        binary_path=FLAGS.hhsearch_binary_path,
-        databases=[FLAGS.pdb70_database_path, FLAGS.cas12folddb_template_database_path])
+    if FLAGS.cas12folddb_template_database_path:
+        template_searcher = hhsearch.HHSearch(
+            binary_path=FLAGS.hhsearch_binary_path,
+            databases=[FLAGS.pdb70_database_path, FLAGS.cas12folddb_template_database_path])
+    else:
+        template_searcher = hhsearch.HHSearch(
+            binary_path=FLAGS.hhsearch_binary_path,
+            databases=[FLAGS.pdb70_database_path])
     template_featurizer = cas12fold_templates.HhsearchHitFeaturizer(
         mmcif_dir=FLAGS.template_mmcif_dir,
         max_template_date=FLAGS.max_template_date,
@@ -469,7 +476,8 @@ def main(argv):
         benchmark=FLAGS.benchmark,
         random_seed=random_seed,
         models_to_relax=FLAGS.models_to_relax,
-        cas12folddb_merge_mode=FLAGS.cas12folddb_merge_mode)
+        cas12folddb_merge_mode=FLAGS.cas12folddb_merge_mode,
+        max_subsequence_ratio=FLAGS.max_subsequence_ratio)
 
 
 if __name__ == '__main__':

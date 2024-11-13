@@ -32,7 +32,9 @@ flags.DEFINE_string('gpu_device', default="0", help='The GPU devices to predict'
 flags.DEFINE_boolean('run_af2_wt', default=False, help='Whether to run raw alphafold2')
 flags.DEFINE_boolean('af2_use_precomputed_msas', default=False, help='Whether to read existing MSAs')
 flags.DEFINE_boolean('run_cas12fold', default=False, help='Whether to run cas12fold')
+flags.DEFINE_boolean('use_cas12fold_template_db', default=False, help='Whether to use cas12fold template database')
 flags.DEFINE_enum_class('cas12folddb_merge_mode', default=Cas12folddbMergeMode.both, enum_class=Cas12folddbMergeMode, help="Modes to merge cas12folddb")
+flags.DEFINE_float('max_subsequence_ratio', default=1, help="The max subsequence ratio used to filter pdb hits")
 FLAGS = flags.FLAGS
 
 
@@ -117,7 +119,9 @@ def main(argv):
         run_cas12fold_cmd += f" --use_precomputed_msas={str(FLAGS.af2_use_precomputed_msas).lower()}"
         run_cas12fold_cmd += f" --cas12folddb_merge_mode={cas12folddb_merge_mode}"
         run_cas12fold_cmd += f" --cas12folddb_database_path={params['cas12folddb_database_path']}"
-        run_cas12fold_cmd += f" --cas12folddb_template_database_path={params['cas12folddb_template_database_path']}"
+        run_cas12fold_cmd += f" --max_subsequence_ratio={FLAGS.max_subsequence_ratio}"
+        if flags.use_cas12fold_template_db:
+            run_cas12fold_cmd += f" --cas12folddb_template_database_path={params['cas12folddb_template_database_path']}"
         run_cas12fold_cmd += f" --num_multimer_predictions_per_model=1"
         run_cas12fold_cmd += f" --db_preset=full_dbs --benchmark=false --use_gpu_relax=true --logtostderr"
         try:
